@@ -70,13 +70,9 @@ app.get('/api/fortune', (req, res) => {
 });
 
 // --- 프론트엔드 파일 제공 ---
+// 'frontend' 폴더에 있는 파일들을 웹사이트의 루트 경로로 제공합니다.
 const frontendPath = path.join(__dirname, 'frontend');
 app.use(express.static(frontendPath));
-
-// API가 아닌 다른 모든 요청은 프론트엔드의 index.html을 보여줌
-app.get('*', (req, res) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
-});
 
 // --- 서버 실행 ---
 const server = app.listen(PORT, '0.0.0.0', () => {
