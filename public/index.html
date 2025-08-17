@@ -1,0 +1,78 @@
+<!-- 기존 HTML 코드... body 태그 안의 script 부분만 아래처럼 수정합니다. -->
+<script>
+    const birthdayInput = document.getElementById('birthday-input');
+    const submitBtn = document.getElementById('submit-btn');
+    const chatContainer = document.getElementById('chat-container');
+    const errorMessage = document.getElementById('error-message');
+
+    // --- 데이터베이스 시뮬레이션 부분을 모두 삭제합니다 ---
+
+    submitBtn.addEventListener('click', showResult);
+    birthdayInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            showResult();
+        }
+    });
+
+    // showResult 함수를 서버와 통신하도록 수정
+    async function showResult() {
+        chatContainer.innerHTML = '';
+        errorMessage.classList.add('hidden');
+        submitBtn.disabled = true; // 버튼 비활성화
+        submitBtn.textContent = '분석 중...';
+
+        const birthday = birthdayInput.value;
+        if (!/^\d{8}$/.test(birthday)) {
+            showError("생년월일 8자리를 정확히 입력해주세요.");
+            submitBtn.disabled = false;
+            submitBtn.textContent = '결과 보기';
+            return;
+        }
+
+        try {
+            // 서버의 API에 fetch를 사용하여 데이터 요청
+            const response = await fetch(`/api/fortune?birthday=${birthday}`);
+            const data = await response.json();
+
+            if (!response.ok) {
+                // 서버에서 보낸 에러 메시지 표시
+                throw new Error(data.error || '데이터를 불러오는데 실패했습니다.');
+            }
+
+            // 성공적으로 데이터를 받으면 메시지 출력
+            displayMessages(data.messages);
+
+        } catch (error) {
+            showError(error.message);
+        } finally {
+            // 성공/실패 여부와 관계없이 버튼 다시 활성화
+            submitBtn.disabled = false;
+            submitBtn.textContent = '결과 보기';
+        }
+    }
+
+    // displayMessages, addMessageBubble, showError 함수는 기존과 동일하게 유지
+    function displayMessages(messages) {
+        let delay = 0;
+        messages.forEach(text => {
+            setTimeout(() => {
+                addMessageBubble(text);
+            }, delay);
+            delay += 800;
+        });
+    }
+
+    function addMessageBubble(text) {
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble max-w-xs md:max-w-sm bg-blue-500 text-white p-3 rounded-lg rounded-bl-none mb-3 shadow';
+        bubble.textContent = text;
+        chatContainer.appendChild(bubble);
+        setTimeout(() => bubble.classList.add('show'), 10);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.classList.remove('hidden');
+    }
+</script>
