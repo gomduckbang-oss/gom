@@ -19,7 +19,6 @@
             opacity: 1;
             transform: translateY(0);
         }
-        /* 스크롤바 스타일링 */
         #chat-container::-webkit-scrollbar {
             width: 8px;
         }
@@ -43,7 +42,6 @@
             <p class="text-gray-500 mt-2">생년월일 8자리를 입력해주세요 (예: 19950101)</p>
         </div>
 
-        <!-- 입력 폼 -->
         <div class="flex flex-col sm:flex-row gap-3 mb-6">
             <input type="text" id="birthday-input" placeholder="YYYYMMDD" class="flex-grow w-full px-4 py-3 text-lg bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300" maxlength="8">
             <button id="submit-btn" class="w-full sm:w-auto bg-blue-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-300 shadow-md">
@@ -51,22 +49,29 @@
             </button>
         </div>
 
-        <!-- 채팅 결과 표시 영역 -->
         <div class="bg-gray-50 h-80 rounded-lg p-4 overflow-y-auto border" id="chat-container">
-            <!-- 메시지가 여기에 동적으로 추가됩니다 -->
         </div>
         
-        <!-- 에러 메시지 표시 영역 -->
         <div id="error-message" class="text-red-500 text-center mt-4 font-medium hidden"></div>
     </div>
 
     <script>
+        // --- 디버깅 코드 추가 ---
+        console.log("페이지 스크립트가 로드되었습니다.");
+
         const birthdayInput = document.getElementById('birthday-input');
         const submitBtn = document.getElementById('submit-btn');
         const chatContainer = document.getElementById('chat-container');
         const errorMessage = document.getElementById('error-message');
 
-        submitBtn.addEventListener('click', showResult);
+        // 버튼이 실제로 존재하는지 확인
+        if (submitBtn) {
+            console.log("'결과 보기' 버튼을 찾았습니다.");
+            submitBtn.addEventListener('click', showResult);
+        } else {
+            console.error("'결과 보기' 버튼을 찾을 수 없습니다. HTML의 id를 확인해주세요.");
+        }
+
         birthdayInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 showResult();
@@ -74,14 +79,17 @@
         });
 
         async function showResult() {
-            // 1. 이전 결과 초기화 및 로딩 상태 표시
+            // --- 디버깅 코드 추가 ---
+            console.log("'결과 보기' 버튼이 클릭되었습니다!");
+
             chatContainer.innerHTML = '';
             errorMessage.classList.add('hidden');
             submitBtn.disabled = true;
             submitBtn.textContent = '분석 중...';
 
-            // 2. 입력값 가져오기 및 유효성 검사
             const birthday = birthdayInput.value;
+            console.log(`입력된 생년월일: ${birthday}`); // 입력값 확인
+
             if (!/^\d{8}$/.test(birthday)) {
                 showError("생년월일 8자리를 정확히 입력해주세요.");
                 submitBtn.disabled = false;
@@ -90,23 +98,23 @@
             }
 
             try {
-                // 3. 서버의 API에 fetch를 사용하여 데이터 요청
+                console.log("서버에 데이터를 요청합니다...");
                 const response = await fetch(`/api/fortune?birthday=${birthday}`);
+                console.log("서버로부터 응답을 받았습니다:", response);
+
                 const data = await response.json();
+                console.log("응답 데이터를 JSON으로 변환했습니다:", data);
 
                 if (!response.ok) {
-                    // 서버에서 보낸 에러 메시지가 있다면 그것을 표시
                     throw new Error(data.error || '데이터를 불러오는데 실패했습니다.');
                 }
 
-                // 4. 성공적으로 데이터를 받으면 메시지 출력
                 displayMessages(data.messages);
 
             } catch (error) {
-                // 5. 네트워크 오류나 기타 예외 발생 시 에러 처리
+                console.error("오류 발생:", error);
                 showError(error.message);
             } finally {
-                // 6. 성공/실패 여부와 관계없이 버튼 다시 활성화
                 submitBtn.disabled = false;
                 submitBtn.textContent = '결과 보기';
             }
@@ -122,7 +130,7 @@
                 setTimeout(() => {
                     addMessageBubble(text);
                 }, delay);
-                delay += 800; // 0.8초 간격으로 메시지 표시
+                delay += 800;
             });
         }
 
@@ -132,10 +140,8 @@
             bubble.textContent = text;
             chatContainer.appendChild(bubble);
             
-            // 애니메이션 효과를 위해 'show' 클래스 추가
             setTimeout(() => bubble.classList.add('show'), 10);
 
-            // 새 메시지가 추가될 때마다 스크롤을 맨 아래로 이동
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
