@@ -1,0 +1,60 @@
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>생년월일 운세</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chat-bubble {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .chat-bubble.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        #chat-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        #chat-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        #chat-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        #chat-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-8">
+        <div class="text-center mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">당신의 이야기를 들려드릴게요</h1>
+            <p class="text-gray-500 mt-2">생년월일 8자리를 입력해주세요 (예: 19950101)</p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3 mb-6">
+            <input type="text" id="birthday-input" placeholder="YYYYMMDD" class="flex-grow w-full px-4 py-3 text-lg bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300" maxlength="8">
+            <button id="submit-btn" class="w-full sm:w-auto bg-blue-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-300 shadow-md">
+                결과 보기
+            </button>
+        </div>
+
+        <div class="bg-gray-50 h-80 rounded-lg p-4 overflow-y-auto border" id="chat-container">
+        </div>
+        
+        <div id="error-message" class="text-red-500 text-center mt-4 font-medium hidden"></div>
+    </div>
+
+    <!-- 모든 자바스크립트 코드를 지우고 아래 한 줄로 교체합니다 -->
+    <script src="script.js" defer></script>
+</body>
+</html>
