@@ -1,20 +1,18 @@
 const express = require('express');
 const path = require('path');
+const xlsx = require('xlsx');
 const cors = require('cors');
 const admin = require('firebase-admin');
 
-// --- 파이어베이스 초기화 (환경 변수 사용) ---
+// --- 파이어베이스 초기화 ---
 try {
-  // Render의 환경 변수에서 서비스 계정 키(JSON)를 직접 읽어옵니다.
   const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
   });
   console.log('파이어베이스에 성공적으로 연결되었습니다.');
 } catch (error) {
   console.error('파이어베이스 초기화 실패:', error);
-  console.log('FIREBASE_SERVICE_ACCOUNT_KEY 환경 변수가 올바르게 설정되었는지 확인해주세요.');
 }
 
 const db = admin.firestore();
@@ -32,14 +30,12 @@ app.get('/api/fortune', async (req, res) => {
       return res.status(400).json({ error: '생년월일은 8자리 숫자로 입력해주세요.' });
     }
 
-    // 1. 'birthdays' 컬렉션에서 생년월일 데이터 조회
     const birthdayDoc = await db.collection('birthdays').doc(birthday).get();
     if (!birthdayDoc.exists) {
       return res.status(404).json({ error: '해당 생년월일의 데이터를 찾을 수 없습니다.' });
     }
     const planetData = birthdayDoc.data();
 
-    // 2. 'messages' 컬렉션에서 각 행성 코드에 맞는 텍스트 조회
     const messageQueue = [];
     const planets = ['sun', 'moon', 'venus', 'mars'];
     
@@ -52,6 +48,9 @@ app.get('/api/fortune', async (req, res) => {
         }
       }
     }
+    
+    // --- 캐시 방지 헤더 추가 ---
+    res.set('Cache-Control', 'no-store');
     
     res.status(200).json({ messages: messageQueue });
 
