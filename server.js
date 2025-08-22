@@ -49,10 +49,13 @@ app.get('/api/fortune', async (req, res) => {
       }
     }
     
-    // --- 캐시 방지 헤더 추가 ---
-    res.set('Cache-Control', 'no-store');
+    // --- 캐시 방지 헤더 및 생성 시간 추가 ---
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     
-    res.status(200).json({ messages: messageQueue });
+    res.status(200).json({ 
+        generatedAt: new Date().toISOString(), // 데이터 생성 시간 추가
+        messages: messageQueue 
+    });
 
   } catch (error) {
     console.error('API 처리 중 오류 발생:', error);
