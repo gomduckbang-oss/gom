@@ -1,6 +1,5 @@
 const express = require('express');
 const path = require('path');
-const xlsx = require('xlsx');
 const cors = require('cors');
 const admin = require('firebase-admin');
 
@@ -49,11 +48,15 @@ app.get('/api/fortune', async (req, res) => {
       }
     }
     
-    // --- 캐시 방지 헤더 및 생성 시간 추가 ---
-    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    // --- 가장 강력한 캐시 방지 헤더 설정 ---
+    res.set({
+      'Cache-Control': 'no-store, no-cache, must-revalidate, private',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
     
     res.status(200).json({ 
-        generatedAt: new Date().toISOString(), // 데이터 생성 시간 추가
+        generatedAt: new Date().toISOString(),
         messages: messageQueue 
     });
 
