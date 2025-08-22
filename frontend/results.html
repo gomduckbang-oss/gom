@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale-1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>결과 보기</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -56,11 +56,11 @@
 
             resultTitle.textContent = `${birthday.substring(0,4)}년 ${birthday.substring(4,6)}월 ${birthday.substring(6,8)}일님의 이야기`;
 
-            // --- 캐시 문제를 해결하기 위해 URL에 타임스탬프 추가 ---
             const timestamp = new Date().getTime();
             const apiUrl = `/api/fortune?birthday=${birthday}&t=${timestamp}`;
 
-            fetch(apiUrl)
+            // --- 브라우저 캐시를 사용하지 않도록 옵션 추가 ---
+            fetch(apiUrl, { cache: 'no-store' })
                 .then(response => {
                     if (!response.ok) {
                         return response.json().then(err => { throw new Error(err.error || '데이터를 불러오지 못했습니다.') });
@@ -68,7 +68,6 @@
                     return response.json();
                 })
                 .then(data => {
-                    // --- 서버가 보내준 생성 시간을 콘솔에 출력 ---
                     console.log("서버가 데이터를 생성한 시간:", data.generatedAt);
                     displayMessages(data.messages);
                 })
