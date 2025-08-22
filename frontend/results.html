@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale-1.0">
     <title>결과 보기</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -46,7 +46,6 @@
             const chatContainer = document.getElementById('chat-container');
             const resultTitle = document.getElementById('result-title');
 
-            // URL에서 생년월일 정보 가져오기
             const params = new URLSearchParams(window.location.search);
             const birthday = params.get('birthday');
 
@@ -57,8 +56,11 @@
 
             resultTitle.textContent = `${birthday.substring(0,4)}년 ${birthday.substring(4,6)}월 ${birthday.substring(6,8)}일님의 이야기`;
 
-            // 서버에 데이터 요청
-            fetch(`/api/fortune?birthday=${birthday}`)
+            // --- 캐시 문제를 해결하기 위해 URL에 타임스탬프 추가 ---
+            const timestamp = new Date().getTime();
+            const apiUrl = `/api/fortune?birthday=${birthday}&t=${timestamp}`;
+
+            fetch(apiUrl)
                 .then(response => {
                     if (!response.ok) {
                         return response.json().then(err => { throw new Error(err.error || '데이터를 불러오지 못했습니다.') });
@@ -66,13 +68,14 @@
                     return response.json();
                 })
                 .then(data => {
+                    // --- 서버가 보내준 생성 시간을 콘솔에 출력 ---
+                    console.log("서버가 데이터를 생성한 시간:", data.generatedAt);
                     displayMessages(data.messages);
                 })
                 .catch(error => {
                     addMessageBubble(`오류가 발생했습니다: ${error.message}`, true);
                 });
 
-            // 메시지를 화면에 표시하는 함수
             const displayMessages = (messages) => {
                 if (!messages || messages.length === 0) {
                     addMessageBubble('표시할 메시지가 없습니다.', true);
