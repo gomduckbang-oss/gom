@@ -3,15 +3,18 @@ const path = require('path');
 const cors = require('cors');
 const admin = require('firebase-admin');
 
-// --- 파이어베이스 초기화 ---
+// --- 파이어베이스 초기화 (환경 변수 사용) ---
 try {
-  const serviceAccount = require('./serviceAccountKey.json');
+  // Render의 환경 변수에서 서비스 계정 키(JSON)를 직접 읽어옵니다.
+  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
   });
-  console.log('파이어베이스에 연결되었습니다.');
+  console.log('파이어베이스에 성공적으로 연결되었습니다.');
 } catch (error) {
   console.error('파이어베이스 초기화 실패:', error);
+  console.log('FIREBASE_SERVICE_ACCOUNT_KEY 환경 변수가 올바르게 설정되었는지 확인해주세요.');
 }
 
 const db = admin.firestore();
